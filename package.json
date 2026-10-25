@@ -1,6 +1,6 @@
 {
     "name": "@dbbyte/sdk",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "description": "Official DBByte SDK for JavaScript and TypeScript",
     "main": "./dist/index.js",
     "module": "./dist/index.mjs",

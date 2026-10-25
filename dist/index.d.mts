@@ -117,11 +117,120 @@ interface DownloadResult {
     contentType: string;
     filename: string | null;
 }
+interface Bucket {
+    id: string;
+    name: string;
+    slug: string;
+    region: string;
+    replicaCount: number;
+    isPublic: boolean;
+    cdn: boolean;
+    versioningEnabled: boolean;
+    fileCount: number;
+    size: number;
+    isDefault: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+interface BucketListResponse {
+    buckets: Bucket[];
+}
+interface BucketResponse {
+    success?: boolean;
+    bucket: Bucket;
+}
+interface CreateBucketOptions {
+    name: string;
+    region: string;
+    replicaCount?: number;
+    isPublic?: boolean;
+    cdn?: boolean;
+}
+interface UpdateBucketOptions {
+    versioningEnabled?: boolean;
+    isPublic?: boolean;
+    cdn?: boolean;
+}
+interface BucketDeleteResponse {
+    success: boolean;
+}
+type PurgeScope = "file" | "bucket";
+interface PurgeOptions {
+    slug: string;
+    scope: PurgeScope;
+    path?: string;
+}
+interface PurgeResponse {
+    success: boolean;
+    purged: number;
+    failed: string[];
+}
+type DataRecord = Record<string, unknown>;
+interface DataQueryOptions {
+    fields?: string[];
+    cursor?: string;
+    limit?: number;
+    filters?: Record<string, string>;
+}
+interface DataPage {
+    data: DataRecord[];
+    next_cursor: string | null;
+}
+interface DataRecordResponse {
+    data: DataRecord;
+}
+interface AppendTextResponse {
+    success: boolean;
+    appendedCharacters: number;
+}
+interface DataDeleteResponse {
+    success: boolean;
+}
+interface UploadUrlOptions {
+    name: string;
+    contentType?: string;
+    size?: number;
+    overwrite?: boolean;
+    expiresIn?: number;
+}
+interface UploadUrlResponse {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    expiresIn: number;
+}
+
+declare class BucketsResource {
+    private client;
+    constructor(client: DBByteClient);
+    list(): Promise<BucketListResponse>;
+    get(slug: string): Promise<BucketResponse>;
+    create(options: CreateBucketOptions): Promise<BucketResponse>;
+    update(slug: string, options: UpdateBucketOptions): Promise<BucketResponse>;
+    delete(slug: string): Promise<BucketDeleteResponse>;
+}
+
+declare class CdnResource {
+    private client;
+    constructor(client: DBByteClient);
+    purge(options: PurgeOptions): Promise<PurgeResponse>;
+}
+
+declare class DataResource {
+    private client;
+    constructor(client: DBByteClient);
+    get(slug: string, options?: DataQueryOptions): Promise<DataPage>;
+    create(slug: string, record: DataRecord): Promise<DataRecordResponse>;
+    appendText(slug: string, text: string): Promise<AppendTextResponse>;
+    update(slug: string, recordId: string, patch: DataRecord): Promise<DataRecordResponse>;
+    delete(slug: string, recordId: string): Promise<DataDeleteResponse>;
+}
 
 declare class ObjectsResource {
     private client;
     constructor(client: DBByteClient);
     upload(bucket: string, options: UploadOptions): Promise<UploadedObject>;
+    uploadUrl(bucket: string, options: UploadUrlOptions): Promise<UploadUrlResponse>;
     list(bucket: string, options?: ListObjectsOptions): Promise<ListObjectsResponse>;
     download(bucket: string, key: string, options?: {
         version?: string;
@@ -144,9 +253,12 @@ declare class DBByteError extends Error {
 
 declare class DBByte {
     private client;
+    readonly buckets: BucketsResource;
+    readonly cdn: CdnResource;
+    readonly data: DataResource;
     readonly objects: ObjectsResource;
     constructor(options: DBByteClientOptions);
     health(): Promise<HealthResponse>;
 }
 
-export { DBByte, type DBByteClientOptions, DBByteError, type DeleteResponse, type DownloadResult, type FileListItem, type FileVersionPreview, type HealthResponse, type ListObjectsOptions, type ListObjectsResponse, type ListVersionsOptions, type ListVersionsResponse, type SignOptions, type SignedUrlResponse, type UploadOptions, type UploadedObject, type VersionEntry };
+export { type AppendTextResponse, type Bucket, type BucketDeleteResponse, type BucketListResponse, type BucketResponse, type CreateBucketOptions, DBByte, type DBByteClientOptions, DBByteError, type DataDeleteResponse, type DataPage, type DataQueryOptions, type DataRecord, type DataRecordResponse, type DeleteResponse, type DownloadResult, type FileListItem, type FileVersionPreview, type HealthResponse, type ListObjectsOptions, type ListObjectsResponse, type ListVersionsOptions, type ListVersionsResponse, type PurgeOptions, type PurgeResponse, type PurgeScope, type SignOptions, type SignedUrlResponse, type UpdateBucketOptions, type UploadOptions, type UploadUrlOptions, type UploadUrlResponse, type UploadedObject, type VersionEntry };

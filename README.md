@@ -6,7 +6,7 @@ Zero dependencies. TypeScript-first, ships with full type definitions.
 
 ## Status
 
-Covers object storage: upload, list, download, delete, versioning, and signed URLs. There is no bucket management, CDN cache control, or analytics API yet - those aren't part of the v1 REST API, so they aren't in the SDK either.
+Covers object storage (upload, list, download, delete, versioning, signed URLs, signed upload URLs), bucket management, CDN cache purge, and Serve data APIs. There is no analytics API.
 
 ## Installation
 
@@ -72,6 +72,44 @@ await db.objects.download('my-bucket', 'images/logo.png', { version: 'some-versi
 
 // Every version, zipped:
 const zip = await db.objects.downloadAllVersions('my-bucket', 'images/logo.png');
+```
+
+### Signed upload URL (direct browser uploads)
+
+```typescript
+const link = await db.objects.uploadUrl('my-bucket', {
+  name: 'photo.jpg',
+  contentType: 'image/jpeg',
+  size: 2_000_000,
+});
+// In the browser: fetch(link.url, { method: link.method, headers: link.headers, body: file })
+```
+
+### Buckets
+
+```typescript
+const { buckets } = await db.buckets.list();
+await db.buckets.create({ name: 'Media', region: 'us-east', isPublic: true });
+await db.buckets.update('media', { versioningEnabled: true });
+await db.buckets.delete('media');
+```
+
+### Cache purge
+
+```typescript
+// Needs a write-permission API key.
+await db.cdn.purge({ slug: 'media', scope: 'file', path: 'logo.png' });
+await db.cdn.purge({ slug: 'media', scope: 'bucket' });
+```
+
+### Serve data APIs
+
+```typescript
+const page = await db.data.get('people', { limit: 20, filters: { city: 'Oslo' } });
+await db.data.create('people', { name: 'Ada' });
+await db.data.update('people', 'record-id', { name: 'Ada L.' });
+await db.data.appendText('notes', 'New line');
+await db.data.delete('people', 'record-id');
 ```
 
 ### Versions

@@ -105,3 +105,107 @@ export interface DownloadResult {
   contentType: string;
   filename: string | null;
 }
+
+export interface Bucket {
+  id: string;
+  name: string;
+  slug: string;
+  region: string;
+  replicaCount: number;
+  isPublic: boolean;
+  cdn: boolean;
+  versioningEnabled: boolean;
+  fileCount: number;
+  size: number;
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface BucketListResponse {
+  buckets: Bucket[];
+}
+
+export interface BucketResponse {
+  success?: boolean;
+  bucket: Bucket;
+}
+
+export interface CreateBucketOptions {
+  name: string;
+  region: string;
+  replicaCount?: number;
+  isPublic?: boolean;
+  cdn?: boolean;
+}
+
+export interface UpdateBucketOptions {
+  versioningEnabled?: boolean;
+  isPublic?: boolean;
+  cdn?: boolean;
+}
+
+export interface BucketDeleteResponse {
+  success: boolean;
+}
+
+export type PurgeScope = "file" | "bucket";
+
+export interface PurgeOptions {
+  slug: string;
+  scope: PurgeScope;
+  // Required when scope is "file".
+  path?: string;
+}
+
+export interface PurgeResponse {
+  success: boolean;
+  purged: number;
+  failed: string[];
+}
+
+export type DataRecord = Record<string, unknown>;
+
+export interface DataQueryOptions {
+  fields?: string[];
+  cursor?: string;
+  limit?: number;
+  // Exact string matches.
+  filters?: Record<string, string>;
+}
+
+export interface DataPage {
+  data: DataRecord[];
+  next_cursor: string | null;
+}
+
+export interface DataRecordResponse {
+  data: DataRecord;
+}
+
+export interface AppendTextResponse {
+  success: boolean;
+  appendedCharacters: number;
+}
+
+export interface DataDeleteResponse {
+  success: boolean;
+}
+
+export interface UploadUrlOptions {
+  // Object name the upload will create (required, max 255 chars, no slashes).
+  name: string;
+  // Must be sent as the Content-Type header on the PUT.
+  contentType?: string;
+  // Maximum bytes the link accepts (up to 50 MB).
+  size?: number;
+  overwrite?: boolean;
+  expiresIn?: number;
+}
+
+export interface UploadUrlResponse {
+  url: string;
+  method: string;
+  headers: Record<string, string>;
+  expiresIn: number;
+}

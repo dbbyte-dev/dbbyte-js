@@ -135,6 +135,83 @@ function encodeKey(key) {
   return key.split("/").map((segment) => encodeURIComponent(segment)).join("/");
 }
 
+// src/resources/buckets.ts
+var BucketsResource = class {
+  constructor(client) {
+    this.client = client;
+  }
+  list() {
+    return this.client.requestJson("GET", "/buckets");
+  }
+  get(slug) {
+    return this.client.requestJson("GET", `/buckets/${encodeKey(slug)}`);
+  }
+  create(options) {
+    return this.client.requestJson("POST", "/buckets", { body: options });
+  }
+  update(slug, options) {
+    return this.client.requestJson("PATCH", `/buckets/${encodeKey(slug)}`, {
+      body: options
+    });
+  }
+  delete(slug) {
+    return this.client.requestJson("DELETE", `/buckets/${encodeKey(slug)}`);
+  }
+};
+
+// src/resources/cdn.ts
+var CdnResource = class {
+  constructor(client) {
+    this.client = client;
+  }
+  // Purges one public file (scope "file", with path) or every public file in
+  // a bucket (scope "bucket"). The API key needs write permission.
+  purge(options) {
+    return this.client.requestJson("POST", "/purge", { body: options });
+  }
+};
+
+// src/resources/data.ts
+var DataResource = class {
+  constructor(client) {
+    this.client = client;
+  }
+  get(slug, options = {}) {
+    const query = {
+      ...options.filters,
+      fields: options.fields?.length ? options.fields.join(",") : void 0,
+      cursor: options.cursor,
+      limit: options.limit
+    };
+    return this.client.requestJson("GET", `/v1/data/${encodeKey(slug)}`, {
+      query
+    });
+  }
+  create(slug, record) {
+    return this.client.requestJson("POST", `/v1/data/${encodeKey(slug)}`, {
+      body: record
+    });
+  }
+  appendText(slug, text) {
+    return this.client.requestJson("POST", `/v1/data/${encodeKey(slug)}`, {
+      body: { appendText: text }
+    });
+  }
+  update(slug, recordId, patch) {
+    return this.client.requestJson(
+      "PATCH",
+      `/v1/data/${encodeKey(slug)}/${encodeKey(recordId)}`,
+      { body: patch }
+    );
+  }
+  delete(slug, recordId) {
+    return this.client.requestJson(
+      "DELETE",
+      `/v1/data/${encodeKey(slug)}/${encodeKey(recordId)}`
+    );
+  }
+};
+
 // src/resources/objects.ts
 var ObjectsResource = class {
   constructor(client) {
@@ -149,6 +226,15 @@ var ObjectsResource = class {
       `/storage/${bucket}/upload`,
       form,
       { overwrite: options.overwrite ? "true" : void 0 }
+    );
+  }
+  // Creates a short-lived signed upload link so a browser can upload straight
+  // to storage without seeing your API key.
+  async uploadUrl(bucket, options) {
+    return this.client.requestJson(
+      "POST",
+      `/storage/${bucket}/upload-url`,
+      { body: options }
     );
   }
   async list(bucket, options = {}) {
@@ -214,6 +300,9 @@ var ObjectsResource = class {
 var DBByte = class {
   constructor(options) {
     this.client = new DBByteClient(options);
+    this.buckets = new BucketsResource(this.client);
+    this.cdn = new CdnResource(this.client);
+    this.data = new DataResource(this.client);
     this.objects = new ObjectsResource(this.client);
   }
   async health() {

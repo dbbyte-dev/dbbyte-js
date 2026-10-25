@@ -18,6 +18,7 @@
     "scripts": {
         "build": "tsup",
         "dev": "tsup --watch",
+        "test": "npm run build && node --test test/api.test.mjs",
         "test:roundtrip": "npm run build && node examples/roundtrip.mjs"
     },
     "devDependencies": {

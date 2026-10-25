@@ -11,6 +11,8 @@ import type {
   ListVersionsResponse,
   DeleteResponse,
   DownloadResult,
+  UploadUrlOptions,
+  UploadUrlResponse,
 } from "../types";
 
 export class ObjectsResource {
@@ -29,6 +31,19 @@ export class ObjectsResource {
       `/storage/${bucket}/upload`,
       form,
       { overwrite: options.overwrite ? "true" : undefined },
+    );
+  }
+
+  // Creates a short-lived signed upload link so a browser can upload straight
+  // to storage without seeing your API key.
+  async uploadUrl(
+    bucket: string,
+    options: UploadUrlOptions,
+  ): Promise<UploadUrlResponse> {
+    return this.client.requestJson<UploadUrlResponse>(
+      "POST",
+      `/storage/${bucket}/upload-url`,
+      { body: options },
     );
   }
 

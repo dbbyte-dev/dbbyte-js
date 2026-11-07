@@ -1,6 +1,6 @@
 # dbbyte
 
-Official DBByte SDK for JavaScript and TypeScript. A thin, typed wrapper over the DBByte v1 REST API. Works in Node.js 18+, the browser, and edge runtimes (Cloudflare Workers, Vercel Edge).
+Official DBByte SDK for JavaScript and TypeScript. A thin, typed wrapper over the DBByte v1 REST API. Works in Node.js 18+, the browser, and edge runtimes (Workers, Vercel Edge).
 
 Zero dependencies. TypeScript-first, ships with full type definitions.
 
@@ -27,7 +27,7 @@ const db = new DBByte({
 | Option | Type | Description |
 | --- | --- | --- |
 | `apiKey` | `string` | Your DBByte API key. Required. |
-| `baseUrl` | `string` | Override the API base URL. Defaults to `https://api.dbbyte.com`. Note: production requests go through a Cloudflare Worker gateway that inserts `/api/v1` itself, so the SDK's own paths don't include it. If you override `baseUrl` to hit a Next.js server directly (e.g. local dev with no Worker in front), include `/api/v1` in the value you pass. |
+| `baseUrl` | `string` | Override the API base URL. Defaults to `https://api.dbbyte.com`. The default host adds `/api/v1` for you. If you point `baseUrl` at a server that doesn't (for example a local dev server), include `/api/v1` in the value you pass. |
 | `timeout` | `number` | Request timeout in ms. Defaults to `30000`. |
 
 ### Health check

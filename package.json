@@ -19,7 +19,8 @@
         "build": "tsup",
         "dev": "tsup --watch",
         "test": "npm run build && node --test test/api.test.mjs",
-        "test:roundtrip": "npm run build && node examples/roundtrip.mjs"
+        "test:roundtrip": "npm run build && node examples/roundtrip.mjs",
+        "prepublishOnly": "npm test"
     },
     "devDependencies": {
         "tsup": "^8.0.0",
@@ -31,6 +32,23 @@
     "license": "MIT",
     "repository": {
         "type": "git",
-        "url": "https://github.com/dbbyte/sdk"
+        "url": "git+https://github.com/dbbyte-dev/dbbyte-js.git"
+    },
+    "homepage": "https://dbbyte.com/sdk",
+    "bugs": {
+        "url": "https://github.com/dbbyte-dev/dbbyte-js/issues"
+    },
+    "keywords": [
+        "dbbyte",
+        "object-storage",
+        "s3",
+        "cdn",
+        "storage",
+        "sdk",
+        "typescript"
+    ],
+    "sideEffects": false,
+    "publishConfig": {
+        "access": "public"
     }
 }
